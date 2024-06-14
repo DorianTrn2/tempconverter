@@ -1,31 +1,41 @@
 services:
-  db:
-    image:
-      mysql:8
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
-      - MYSQL_DATABASE=tempconverter_db
-      - MYSQL_USER=tempuser
-      - MYSQL_PASWWORD=temppassword
-    networks:
-      - tempconverter-net
-    
   app:
-    image: doriantrn/tempconverter:latest
-    environment:
-      - DB_USER=tempuser
-      - DB_PASS=temppassword
-      - DB_HOST=db
-      - DB_NAME=tempconverter_db
-      - STUDENT=Dorian Tarin
-      - COLLEGE=Algebra University College
+    image: docker.io/doriantrn/tempconverter:latest
     ports:
       - 5000:5000
+    environment:
+      - DB_USER=username
+      - DB_PASS=supersecretpassword
+      - DB_HOST=db
+      - DB_NAME=dbname
+      - STUDENT=Dorian Tarin
+      - COLLEGE=Algebra University College
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - tempconverter-net
-    depends_on:
-      - db
+
+  db:
+    image: mysql:8
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_DATABASE=dbname
+      - MYSQL_USER=username
+      - MYSQL_PASSWORD=supersecretpassword
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost"]
+      interval: 2s
+      timeout: 10s
+      retries: 10
+    networks:
+      - tempconverter-net
+    volumes:
+      - db-data:/var/lib/mysql
 
 networks:
   tempconverter-net:
     driver: bridge
+
+volumes:
+  db-data:
