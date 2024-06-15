@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  app:
+    image: docker.io/doriantrn/tempconverter:latest
+    ports:
+      - "80:5000"
+    environment:
+      DB_USER: username
+      DB_PASS: supersecretpassword
+      DB_HOST: db
+      DB_NAME: dbname
+      STUDENT: "Dorian Tarin"
+      COLLEGE: "Algebra University College"
+    networks:
+      - tempconverter-net
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - db 
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: dbname
+      MYSQL_USER: username
+      MYSQL_PASSWORD: supersecretpassword
+    networks:
+      - tempconverter-net
+    volumes:
+      - db-data:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy: 
+        condition: on-failure
+      
+networks:
+  tempconverter-net: 
+    driver: overlay
+volumes:
+  db-data:
