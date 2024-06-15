@@ -1,28 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tempconverter
-  namespace: tempconverter
+  name: tempconverter-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: tempconverter
+      app: tempconverter-app
   template:
     metadata:
       labels:
-        app: tempconverter
+        app: tempconverter-app
     spec:
       containers:
-        - name: tempconverter
-          image: <your-dockerhub-username>/tempconverter:latest
+        - name: app
+          image: docker.io/doriantrn/tempconverter:latest
           env:
             - name: DB_USER
               value: username
             - name: DB_PASS
               value: supersecretpassword
             - name: DB_HOST
-              value: mysql
+              value: tempconverter-db
             - name: DB_NAME
               value: dbname
             - name: STUDENT
