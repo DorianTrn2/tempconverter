@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: mysql
+  namespace: tempconverter
+spec:
+  replicas: 1
+  selector: 
+  matchLabels:
+    app: mysql
+    template:
+      metadata:
+        labels: 
+          app: mysql
+      spec:
+        containers:
+          - name: mysql
+            image: mysql:8
+            env:
+              - name: MYSQL_RANDOM_ROOT_PASSWORD
+                value: "yes"
+              - name: MYSQL_DATABASE
+                value: dbname
+              - name: MYSQL_USER
+                value: username
+              - name: MYSQL_PASSWORD
+                value: supersecretpassword
+            volumeMounts:
+              - name: mysql-data
+                mountPath: /var/lib/mysql
+            ports:
+              - containerPort: 3306
